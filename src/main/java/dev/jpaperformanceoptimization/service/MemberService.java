@@ -2,6 +2,7 @@ package dev.jpaperformanceoptimization.service;
 
 import dev.jpaperformanceoptimization.domain.Member;
 import dev.jpaperformanceoptimization.repository.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,5 +29,9 @@ public class MemberService {
     public Member findOne(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow();
+    }
+
+    public List<Member> findMembers() {
+        return memberRepository.findAll();
     }
 }
