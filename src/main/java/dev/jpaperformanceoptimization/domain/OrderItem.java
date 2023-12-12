@@ -8,9 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "order_item")
+@NoArgsConstructor
 public class OrderItem {
 
     @Id @GeneratedValue
@@ -28,7 +30,17 @@ public class OrderItem {
     private int orderPrice; //주문 가격
     private int count; //주문 수량
 
+    public OrderItem(Book book, int orderPrice, int count) {
+        this.item = book;
+        this.orderPrice = orderPrice;
+        this.count = count;
+    }
+
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public static OrderItem createOrderItem(Book book, int orderPrice, int count) {
+        return new OrderItem(book, orderPrice, count);
     }
 }
