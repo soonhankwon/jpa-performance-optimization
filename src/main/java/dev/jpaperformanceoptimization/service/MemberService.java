@@ -17,4 +17,16 @@ public class MemberService {
         memberRepository.save(member);
         return member.getId();
     }
+
+    @Transactional
+    public void update(Long id, String name) {
+        Member member = findOne(id);
+        member.setName(name);
+        //dirty check: update query
+    }
+
+    public Member findOne(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow();
+    }
 }
