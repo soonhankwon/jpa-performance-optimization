@@ -9,8 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "order_item")
 @NoArgsConstructor
@@ -36,10 +40,6 @@ public class OrderItem {
         this.item = book;
         this.orderPrice = orderPrice;
         this.count = count;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
     }
 
     public static OrderItem createOrderItem(Book book, int orderPrice, int count) {
