@@ -6,6 +6,7 @@ import dev.jpaperformanceoptimization.domain.Address;
 import dev.jpaperformanceoptimization.domain.Order;
 import dev.jpaperformanceoptimization.domain.OrderStatus;
 import dev.jpaperformanceoptimization.repository.OrderRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final EntityManager em;
 
     @GetMapping("/api/v1/simple-orders")
     public List<Order> orderV1() {
@@ -36,6 +38,20 @@ public class OrderSimpleApiController {
         List<Order> orders = orderRepository.findAll();
 
         //루프
+        return orders.stream()
+                .map(SimpleOrderDto::new)
+                .collect(toList());
+    }
+
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> orderV3() {
+        List<Order> orders = em.createQuery(
+                "select o from Order o "
+                        + "join fetch o.member m "
+                        + "join fetch o.delivery d",
+                Order.class
+        ).getResultList();
+
         return orders.stream()
                 .map(SimpleOrderDto::new)
                 .collect(toList());
