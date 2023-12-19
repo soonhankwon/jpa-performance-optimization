@@ -6,6 +6,8 @@ import dev.jpaperformanceoptimization.domain.Address;
 import dev.jpaperformanceoptimization.domain.Order;
 import dev.jpaperformanceoptimization.domain.OrderStatus;
 import dev.jpaperformanceoptimization.repository.OrderRepository;
+import dev.jpaperformanceoptimization.repository.order.simplequery.OrderSimpleQueryDto;
+import dev.jpaperformanceoptimization.repository.order.simplequery.OrderSimpleQueryRepository;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
     private final EntityManager em;
 
     @GetMapping("/api/v1/simple-orders")
@@ -55,6 +58,11 @@ public class OrderSimpleApiController {
         return orders.stream()
                 .map(SimpleOrderDto::new)
                 .collect(toList());
+    }
+
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> orderV4() {
+        return orderSimpleQueryRepository.findOrderDtos();
     }
 
     @Data
