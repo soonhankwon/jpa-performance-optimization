@@ -13,6 +13,7 @@ import dev.jpaperformanceoptimization.repository.order.query.OrderFlatDto;
 import dev.jpaperformanceoptimization.repository.order.query.OrderItemQueryDto;
 import dev.jpaperformanceoptimization.repository.order.query.OrderQueryDto;
 import dev.jpaperformanceoptimization.repository.order.query.OrderQueryRepository;
+import dev.jpaperformanceoptimization.service.query.OrderQueryService;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,26 +30,16 @@ public class OrderApiController {
     private final OrderRepository orderRepository;
     private final EntityManager em;
     private final OrderQueryRepository orderQueryRepository;
+    private final OrderQueryService orderQueryService;
 
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
-        List<Order> all = orderRepository.findAll();
-        for (Order order : all) {
-            order.getMember().getName();
-            order.getDelivery().getAddress();
-
-            List<OrderItem> orderItems = order.getOrderItems();
-            orderItems.stream().forEach(o -> o.getItem().getName());
-        }
-        return all;
+        return orderQueryService.getOrderV1();
     }
 
     @GetMapping("/api/v2/orders")
     public List<OrderDto> ordersV2() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(OrderDto::new)
-                .collect(toList());
+        return orderQueryService.getOrderV2();
     }
 
     @GetMapping("/api/v3/orders")
@@ -110,7 +101,7 @@ public class OrderApiController {
     }
 
     @Data
-    static class OrderDto {
+    public static class OrderDto {
         private Long orderId;
         private String name;
         private LocalDateTime orderDate;
