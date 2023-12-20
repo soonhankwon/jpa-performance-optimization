@@ -7,6 +7,7 @@ import dev.jpaperformanceoptimization.domain.Order;
 import dev.jpaperformanceoptimization.domain.OrderItem;
 import dev.jpaperformanceoptimization.domain.OrderStatus;
 import dev.jpaperformanceoptimization.repository.OrderRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final EntityManager em;
 
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
@@ -36,6 +38,20 @@ public class OrderApiController {
     @GetMapping("/api/v2/orders")
     public List<OrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(OrderDto::new)
+                .collect(toList());
+    }
+
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> ordersV3() {
+        List<Order> orders = em.createQuery(
+                        "select distinct o from Order o "
+                                + "join fetch o.member m "
+                                + "join fetch o.delivery d "
+                                + "join fetch o.orderItems oi "
+                                + "join fetch oi.item i", Order.class)
+                .getResultList();
         return orders.stream()
                 .map(OrderDto::new)
                 .collect(toList());
