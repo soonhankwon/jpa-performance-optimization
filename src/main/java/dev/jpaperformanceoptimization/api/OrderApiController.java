@@ -13,6 +13,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,6 +53,23 @@ public class OrderApiController {
                                 + "join fetch o.orderItems oi "
                                 + "join fetch oi.item i", Order.class)
                 .getResultList();
+        return orders.stream()
+                .map(OrderDto::new)
+                .collect(toList());
+    }
+
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                        @RequestParam(value = "limit", defaultValue = "100") int limit) {
+        List<Order> orders = em.createQuery(
+                        "select distinct o from Order o "
+                                + "join fetch o.member m "
+                                + "join fetch o.delivery d "
+                        , Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+
         return orders.stream()
                 .map(OrderDto::new)
                 .collect(toList());
