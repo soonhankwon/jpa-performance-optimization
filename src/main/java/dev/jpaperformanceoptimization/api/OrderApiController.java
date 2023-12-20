@@ -7,6 +7,8 @@ import dev.jpaperformanceoptimization.domain.Order;
 import dev.jpaperformanceoptimization.domain.OrderItem;
 import dev.jpaperformanceoptimization.domain.OrderStatus;
 import dev.jpaperformanceoptimization.repository.OrderRepository;
+import dev.jpaperformanceoptimization.repository.order.query.OrderQueryDto;
+import dev.jpaperformanceoptimization.repository.order.query.OrderQueryRepository;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +24,7 @@ public class OrderApiController {
 
     private final OrderRepository orderRepository;
     private final EntityManager em;
+    private final OrderQueryRepository orderQueryRepository;
 
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
@@ -73,6 +76,11 @@ public class OrderApiController {
         return orders.stream()
                 .map(OrderDto::new)
                 .collect(toList());
+    }
+
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> orderV4() {
+        return orderQueryRepository.findOrderQueryDtos();
     }
 
     @Data
