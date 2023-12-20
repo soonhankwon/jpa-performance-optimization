@@ -1,5 +1,7 @@
 package dev.jpaperformanceoptimization.api;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
 import dev.jpaperformanceoptimization.domain.Address;
@@ -7,6 +9,8 @@ import dev.jpaperformanceoptimization.domain.Order;
 import dev.jpaperformanceoptimization.domain.OrderItem;
 import dev.jpaperformanceoptimization.domain.OrderStatus;
 import dev.jpaperformanceoptimization.repository.OrderRepository;
+import dev.jpaperformanceoptimization.repository.order.query.OrderFlatDto;
+import dev.jpaperformanceoptimization.repository.order.query.OrderItemQueryDto;
 import dev.jpaperformanceoptimization.repository.order.query.OrderQueryDto;
 import dev.jpaperformanceoptimization.repository.order.query.OrderQueryRepository;
 import jakarta.persistence.EntityManager;
@@ -86,6 +90,23 @@ public class OrderApiController {
     @GetMapping("/api/v5/orders")
     public List<OrderQueryDto> orderV5() {
         return orderQueryRepository.findAllByDto_optimization();
+    }
+
+    @GetMapping("/api/v6/orders")
+    public List<OrderQueryDto> orderV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+        return flats.stream()
+                .collect(groupingBy(
+                        o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(),
+                                o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(),
+                                o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(),
+                        e.getKey().getName(), e.getKey().getOrderDate(),
+                        e.getKey().getOrderStatus(), e.getKey().getAddress(),
+                        e.getValue()))
+                .collect(toList());
     }
 
     @Data
